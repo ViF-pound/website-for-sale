@@ -1,26 +1,44 @@
 from fastapi import APIRouter
 
-from ..catalog.catalog_models import Category, SubCategory, Product
+from src.catalog.catalog_models import Category, SubCategory, Product
+from src.db import session
+from src.catalog.catalog_shema import NewCategory, NewSubcategory, NewProduct
 
-catalog_router = APIRouter(prefix="/catalog", teg=["catalog"])
 
-@catalog_router.post("/new_category")
-async def new_category(name: str):
-    NewCategory = Category(name = name)
+catalog_router = APIRouter(prefix="/catalog", tags=["catalog"])
+
+
+@catalog_router.post("/add/category")
+async def new_category(data_newcategory: NewCategory):
+
+    NewCategory = Category(name = data_newcategory.name)
+
     session.add(NewCategory)
     await session.commit()
-    return "New category add"
+    await session.refresh(NewCategory)
 
-@catalog_router.post("/new_subcatalog")
-async def new_subcategory(name: str, id: int):
-    NewSubcategory = SubCategory(name = name)
+    return {"message": "new category add"}
+
+
+@catalog_router.post("/add/subcatalog")
+async def new_subcategory(data_newsubcategory: NewSubcategory):
+
+    NewSubcategory = SubCategory(category_id = data_newsubcategory.category_id, name = data_newsubcategory.name)
+
     session.add(NewSubcategory)
     await session.commit()
-    return "New subcategory add"
+    await session.refresh(NewSubcategory)
 
-@catalog_router.post("/new_product")
-async def new_product(name: str):
-    NewProduct = Product(name = name)
+    return {"message": "new subcategory add"}
+
+
+@catalog_router.post("/add/product")
+async def new_product(data_newproduct: NewProduct):
+
+    NewProduct = Product(subcategory_id = data_newproduct.subcategory_id, name = data_newproduct.name)
+
     session.add(NewProduct)
     await session.commit()
-    return "New product add"
+    await session.refresh(NewProduct)
+    
+    return {"message": "new product add"}

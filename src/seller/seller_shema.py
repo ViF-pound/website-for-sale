@@ -1,15 +1,19 @@
 from pydantic import BaseModel
 
-from ..types.currencyType import CurrencyType
+from src.types.currencyType import CurrencyType
 
-class Product(BaseModel):
+
+class NewProduct(BaseModel):
 
     name:str
     description:str
     price:float
     currency:CurrencyType
 
+
 class Review(BaseModel):
 
-    estimation:float
+    seller_id: int
+    estimation: None
     text:str
+

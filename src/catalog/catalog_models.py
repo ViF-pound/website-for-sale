@@ -1,42 +1,43 @@
-from sqlalchemy import create_engine, ForeignKey
+from typing import TYPE_CHECKING
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.ext.declarative import declarative_base
 
-from ..seller.seller_models import SellerProduct
+from src.db import Base
 
-Base = declarative_base()
+if TYPE_CHECKING:
+    from src.seller.seller_models import SellerProduct
 
 
 class Category(Base):
-    __tablename__ = "categories_database"
+    __tablename__ = "categories_table"
 
     id:Mapped[int] = mapped_column(primary_key=True)
 
     name:Mapped[str]
 
-    subcategories:Mapped[list["SubCategory"]] = relationship(back_populates="category")
+    subcategories:Mapped[list["SubCategory"]] = relationship(back_populates="category", uselist=True)
 
 
 class SubCategory(Base):
-    __tablename__ = "subcategories_database"
+    __tablename__ = "subcategories_table"
 
     id:Mapped[int] = mapped_column(primary_key=True)
 
     name:Mapped[str]
 
-    category_id:Mapped[int] = mapped_column(ForeignKey("categories_database.id", ondelete="CASCADE"))
-    category:Mapped["Category"] = relationship(back_populates="subcategories")
-    products:Mapped[list["Product"]] = relationship(back_populates="subcategory")
+    category_id:Mapped[int] = mapped_column(ForeignKey("categories_table.id", ondelete="CASCADE"))
+    category:Mapped["Category"] = relationship(back_populates="subcategories", uselist=False)
+    products:Mapped[list["Product"]] = relationship(back_populates="subcategory", uselist=True)
 
 
 class Product(Base):
-    __tablename__ = "products_database"
+    __tablename__ = "products_table"
 
     id:Mapped[int] = mapped_column(primary_key=True)
 
     name:Mapped[str]
 
-    subcategory_id:Mapped[int] = mapped_column(ForeignKey("sibcategories_database.id", ondelete="CASCADE"))
-    subcategory:Mapped["SubCategory"] = relationship(back_populates="products")
-    sellerproducts:Mapped[list["SellerProduct"]] = relationship(back_populates="product")
+    subcategory_id:Mapped[int] = mapped_column(ForeignKey("subcategories_table.id", ondelete="CASCADE"))
+    subcategory:Mapped["SubCategory"] = relationship(back_populates="products", uselist=False)
+    sellerproducts:Mapped[list["SellerProduct"]] = relationship(back_populates="product", uselist=True)
     
