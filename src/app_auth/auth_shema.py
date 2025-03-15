@@ -5,24 +5,40 @@ from pydantic import BaseModel, EmailStr
 
 class RegisterUser(BaseModel):
 
-    name: str
-    email: EmailStr
-    dob: datetime.time
-    password: str
-
-
-class LoginUserEmail(BaseModel):
-
-    email: EmailStr
-    password: str
-
-
-class LoginUserName(BaseModel):
-
+    profile_name: str
     user_name: str
+    email: EmailStr
+    dob: datetime.date
     password: str
 
 
-class UpdateDataName(BaseModel):
+class LoginUser(BaseModel):
 
-    new_profile_name: str
+    email: EmailStr | None
+    user_name: str | None
+    password: str
+
+
+class UpdateData(BaseModel):
+
+    new_user_name: str | None
+    new_profile_name: str | None
+    password: str | None
+    new_password: str | None
+
+
+class ShowUserWithToken(BaseModel):
+
+    profile_name: str
+    user_name: str
+    email: str
+    dob: datetime.date
+    token: str
+
+
+class ShowUser(BaseModel):
+
+    profile_name: str
+    user_name: str
+    email: str
+    dob: datetime.date

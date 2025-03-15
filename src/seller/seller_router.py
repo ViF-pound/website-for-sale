@@ -1,35 +1,21 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
-from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.seller.seller_shema import NewProduct, Review
-from src.seller.seller_models import SellerProduct
-from src.db import session
+from src.seller.seller_schema import NewProduct
+from src.models.seller_models.sellerProduct_model import SellerProduct
+from src.db import get_session
 
 
 seller_router = APIRouter(prefix="/seller", tags=["/seller"])
 
 
 @seller_router.post("/new_product")
-async def newProduct(data_product: NewProduct):
+async def newProduct(data_product: NewProduct, session:AsyncSession = Depends(get_session)):
     
-    new_product = SellerProduct(name = data_product.name, description = data_product.description, price = data_product.price, curenccy = data_product.currency)
+    new_product = SellerProduct(**data_product.model_dump())
     
     session.add(new_product)
-    session.commit()
+    await session.commit()
     
-    return {"message": "product created successfully"}
-
-
-@seller_router.post("/review")
-async def review(data_review: Review):
-
-    new_review = Review(seller_id = data_review.seller_id, estimation = data_review.estimation, text = data_review.text)
-
-    if new_review.estimation != True and new_review.estimation != False:
-        raise HTTPException(status_code=400, detail="incorect estimation")
-
-    session.add(new_review)
-    session.commit()
-
-    return {"message": "review left"}
+    return new_product

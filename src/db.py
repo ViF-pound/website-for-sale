@@ -4,13 +4,13 @@ from sqlalchemy.orm import DeclarativeBase
 
 from src.config import config
 
-engine = create_async_engine(url = config.db_url_async, echo=True)
+engine = create_async_engine(url = config.env_data.db_url_async, echo=True)
 
-session = sessionmaker(engine, class_=AsyncSession)
+assync_session = sessionmaker(engine, class_=AsyncSession)
 
 async def get_session():
-    async with session() as connection:
-        yield connection
+    async with assync_session() as session:
+        yield session
 
 class Base(DeclarativeBase):
     ...

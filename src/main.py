@@ -5,6 +5,9 @@ from src.db import engine, Base
 from src.catalog.catalog_router import catalog_router
 from src.app_auth.auth_router import auth_router
 from src.seller.seller_router import seller_router
+from src.check_router import router
+from src.client.client_router import client_router
+from src.models.backet_model import UserBacket
 
 from binascii import Error
 import os
@@ -14,6 +17,8 @@ app = FastAPI()
 app.include_router(auth_router)
 app.include_router(catalog_router)
 app.include_router(seller_router)
+app.include_router(router)
+app.include_router(client_router)
 
 origins = [
     "http://localhost:3000"
@@ -39,7 +44,3 @@ async def create_db():
         except Error as e:
             print(e)
         await  conn.run_sync(Base.metadata.create_all)
-
-UPLOAD_FOLDER = 'uploads'
-
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)

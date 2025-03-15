@@ -1,3 +1,4 @@
 .env
 src/app_auth/tokens
 _pycache_
+src/check_router.py

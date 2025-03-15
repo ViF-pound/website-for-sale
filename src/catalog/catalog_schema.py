@@ -3,16 +3,16 @@ from pydantic import BaseModel
 
 class NewCategory(BaseModel):
 
-    new_category: str
+    name: str
 
 
 class NewSubcategory(BaseModel):
 
-    id_category: int
-    new_subcategory: str
+    category_id: int
+    name: str
 
 
 class NewProduct(BaseModel):
 
-    id_subcategory: int
-    new_product: str
+    subcategory_id: int
+    name: str
