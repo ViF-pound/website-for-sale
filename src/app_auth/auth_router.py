@@ -18,11 +18,11 @@ async def register(data_user: RegisterUser, session:AsyncSession = Depends(get_s
 
     user = await session.scalar(select(User).where(User.email == data_user.email))
     if user:
-        raise HTTPException(status_code=400, detail={"this email busy"})
+        raise HTTPException(status_code=400, detail="this email busy")
     
     user = await session.scalar(select(User).where(User.user_name == data_user.user_name))
     if user:
-        raise HTTPException(status_code=400, detail={"this name busy"})
+        raise HTTPException(status_code=400, detail="this name busy")
     
     data_profile = data_user.model_dump()
     data_profile["password"] = await hach_password(password=data_user.password)
@@ -53,7 +53,7 @@ async def login_user(data_user: LoginUser, session:AsyncSession = Depends(get_se
             user_token = await create_access_token(user_id=user.id)
             return {"token": user_token}
 
-        raise HTTPException(status_code=400, detail={"check enter data"})
+        raise HTTPException(status_code=400, detail="check enter data")
     
     elif data_user.user_name:
 
@@ -64,9 +64,9 @@ async def login_user(data_user: LoginUser, session:AsyncSession = Depends(get_se
             user_token = await create_access_token(user_id=user.id)
             return {"token": user_token}
 
-        raise HTTPException(status_code=400, detail={"check enter data"})
+        raise HTTPException(status_code=400, detail="check enter data")
     
-    raise HTTPException(status_code=400, detail={"no data"})
+    raise HTTPException(status_code=400, detail="no data")
     
 
 @auth_router.get("/profile", response_model=ShowUser)
@@ -79,19 +79,22 @@ async def show_profile(profile = Depends(get_current_user)):
 async def update_data_user(new_data_user: UpdateData, profile: User = Depends(get_current_user), session: AsyncSession = Depends(get_session)):
     
     if new_data_user.new_user_name:
+        user = await session.scalar(select(User).where(User.user_name == new_data_user.new_user_name))
+        if user:
+            raise HTTPException(status_code=400, detail="this name busy")
         profile.profile_name = new_data_user.new_profile_name
 
     if new_data_user.new_profile_name:
         if await check_hached_password(new_data_user.password, profile.password):
             profile.user_name = new_data_user.new_user_name
         else:
-            raise HTTPException(status_code=400, detail={"check enter password"})
+            raise HTTPException(status_code=400, detail="check enter password")
 
     if new_data_user.new_password:
         if await check_hached_password(new_data_user.password, profile.password):
             profile.password = await hach_password(new_data_user.new_password)
         else:
-            raise HTTPException(status_code=400, detail={"check enter password"})
+            raise HTTPException(status_code=400, detail="check enter password")
 
     await session.commit()
     await session.refresh(profile)

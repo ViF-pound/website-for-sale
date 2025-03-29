@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models.catalog_models.category_model import Category
@@ -27,6 +28,10 @@ async def new_category(data_newcategory: NewCategory, session:AsyncSession = Dep
 @catalog_router.post("/add/subcatalog")
 async def new_subcategory(data_newsubcategory: NewSubcategory, session:AsyncSession = Depends(get_session)):
 
+    category = await session.scalar(select(Category).where(Category.id == data_newsubcategory.category_id))
+    if not category:
+        raise HTTPException(status_code=404, detail="not found category")
+    
     NewSubcategory = SubCategory(**data_newsubcategory.model_dump())
 
     session.add(NewSubcategory)
@@ -38,6 +43,10 @@ async def new_subcategory(data_newsubcategory: NewSubcategory, session:AsyncSess
 
 @catalog_router.post("/add/product")
 async def new_product(data_newproduct: NewProduct, session:AsyncSession = Depends(get_session)):
+
+    subCategory = await session.scalar(select(SubCategory).where(SubCategory.id == data_newproduct.subcategory_id))
+    if not subCategory:
+        raise HTTPException(status_code=404, detail="not found subCategory")
 
     NewProduct = Product(**data_newproduct.model_dump())
 

@@ -26,12 +26,12 @@ async def get_products(session:AsyncSession = Depends(get_session)):
 async def review_add(data_review: Review, user_id:int = Depends(get_current_id),  session:AsyncSession = Depends(get_session)):
 
     if not user_id:
-         return {"massage": "you not auth"}
+        raise HTTPException(status_code=401, detail="not auth")
 
     new_review = Review(**data_review.model_dump())
 
     if not new_review.estimation:
-        raise HTTPException(status_code=400, detail={"incorect estimation"})
+        raise HTTPException(status_code=400, detail="incorect estimation")
 
     session.add(new_review)
     session.commit()
@@ -43,12 +43,12 @@ async def review_add(data_review: Review, user_id:int = Depends(get_current_id),
 async def review_delete(id_review: int, user_id: int = Depends(get_current_id), session:AsyncSession = Depends(get_session)):
 
     if not user_id:
-         return {"massage": "you not auth"}
+         raise HTTPException(status_code=401, detail="not auth")
     
     review = await session.scalar(select(Review).where(Review.id == id_review))
 
     if not review.estimation:
-        raise HTTPException(status_code=400, detail={"incorect estimation"})
+        raise HTTPException(status_code=400, detail="incorect estimation")
 
     session.delete(review)
     session.commit()
@@ -62,8 +62,7 @@ async def get_reviews(seller_id:int = Depends(get_current_id), session:AsyncSess
     seller = await session.scalar(select(Seller).options(selectinload(Seller.reviews)).where(Seller.id == seller_id))
 
     if not seller:
-        
-            raise HTTPException(status_code=426, detail="no data found")
+        raise HTTPException(status_code=426, detail="no data found")
 
     return seller.reviews
 
