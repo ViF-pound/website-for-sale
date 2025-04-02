@@ -15,6 +15,7 @@ class Seller(Base):
 
     id:Mapped[int] = mapped_column(primary_key=True)
 
+    seller_name:Mapped[str] = mapped_column(unique=True)
     rating:Mapped[float] = mapped_column(default=0.00)
 
     user:Mapped["User"] = relationship(back_populates="seller", uselist=False)

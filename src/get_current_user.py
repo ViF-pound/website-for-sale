@@ -36,10 +36,10 @@ async def get_current_user(user_id = Depends(get_current_id), session: AsyncSess
 
 async def get_current_confirm_seller(user: User = Depends(get_current_user)):
     
-    if not user.profile:
+    if not user.seller:
         raise HTTPException(status_code=426, detail={"token":"You have not profile"})
         
-    if not user.profile.is_confirmed:
+    if not user.seller.is_confirmed:
         raise HTTPException(status_code=426, detail={"token":"You have not confirmed your profile"})
         
     return user

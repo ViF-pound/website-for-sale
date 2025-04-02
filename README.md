@@ -16,11 +16,11 @@ user
 
 seller
 
-[] create product
-
 [] create seller profile
 
 [] create seller product
+
+[] show seller products
 
 client
 
